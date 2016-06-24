@@ -1,0 +1,14 @@
+[package]
+name = "i-o"
+version = "0.1.0"
+authors = ["M Farkas-Dyck <strake888@gmail.com>"]
+description = "Input and output"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+containers = "0.1"
+void = { version = "1", default-features = false }
+
+[dev-dependencies]
+quickcheck = "0.2"
+quickcheck_macros = "0.2"
