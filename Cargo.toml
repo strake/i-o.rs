@@ -13,5 +13,5 @@ containers = "0.1"
 void = { version = "1", default-features = false }
 
 [dev-dependencies]
-quickcheck = "0.2"
-quickcheck_macros = "0.2"
+quickcheck = "0.4"
+quickcheck_macros = "0.4"
