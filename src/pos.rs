@@ -50,7 +50,6 @@ impl<S: Copy, T: DerefMut<Target = [S]>> Write<S> for Pos<T> {
 
     use ::util::*;
     use super::*;
-    use super::super::*;
 
     fn test_read<T: Copy + Eq + fmt::Debug>(xs: std::vec::Vec<T>) -> bool {
         Iterator::eq(xs.clone().into_iter(),

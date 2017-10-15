@@ -63,7 +63,7 @@ pub trait Read<T: Copy> {
 
     /// Pull `buf.len()` data from this source into given buffer; return `()` if so many data were actually read, or a failure and how many data were read before the failure.
     #[inline]
-    fn read_full<E: From<Self::Err> + From<EndOfFile>>(&mut self, mut buf: &mut [T]) -> Result<(), (E, usize)> {
+    fn read_full<E: From<Self::Err> + From<EndOfFile>>(&mut self, buf: &mut [T]) -> Result<(), (E, usize)> {
         let mut n = 0;
         while n < buf.len() {
             match self.read(&mut buf[n..]) {
@@ -114,7 +114,7 @@ pub trait PosRead<T: Copy>: Read<T> {
 
     /// Pull `buf.len()` data from this source at given position into given buffer; return `()` if so many data were actually read, or a failure and how many data were read before the failure.
     #[inline]
-    fn pread_full<E: From<Self::Err> + From<EndOfFile>>(&mut self, mut buf: &mut [T], mut pos: usize) -> Result<(), (E, usize)> {
+    fn pread_full<E: From<Self::Err> + From<EndOfFile>>(&mut self, buf: &mut [T], mut pos: usize) -> Result<(), (E, usize)> {
         let mut n = 0;
         while n < buf.len() {
             match self.pread(&mut buf[n..], pos) {
