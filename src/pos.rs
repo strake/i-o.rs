@@ -15,8 +15,6 @@ impl<T> From<T> for Pos<T> {
 
 impl<T> Pos<T> {
     #[inline] pub fn unwrap(self) -> T { self.buf }
-    #[inline] pub fn pos(self) -> usize { self.pos }
-    #[inline] pub fn set_pos(&mut self, pos: usize) { self.pos = pos }
 }
 
 impl<S: Copy, T: Deref<Target = [S]>> Read<S> for Pos<T> {
