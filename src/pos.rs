@@ -1,4 +1,5 @@
 use core::cmp::min;
+use core::fmt;
 use core::ops::{ Deref, DerefMut };
 use void::Void;
 
@@ -39,6 +40,14 @@ impl<S: Copy, T: DerefMut<Target = [S]>> Write<S> for Pos<T> {
     }
 
     #[inline] fn flush(&mut self) -> Result<(), Void> { Ok(()) }
+}
+
+impl<T: DerefMut<Target = [u8]>> fmt::Write for Pos<T> {
+    #[inline]
+    fn write_str(&mut self, s: &str) -> fmt::Result { match self.write(s.as_bytes()) {
+        Ok(_) => Ok(()),
+        Err(v) => match v {},
+    } }
 }
 
 #[cfg(test)] mod tests {
