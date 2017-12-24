@@ -18,7 +18,8 @@ use core::marker::PhantomData;
 use core::mem;
 use void::Void;
 
-pub mod pos;
+mod pos;
+pub use pos::Pos;
 
 mod util;
 
