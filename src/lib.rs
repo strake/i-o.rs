@@ -16,6 +16,7 @@ use core::cmp::max;
 use core::convert::From;
 use core::marker::PhantomData;
 use core::mem;
+use core::ops::*;
 use void::Void;
 
 mod pos;
@@ -273,6 +274,39 @@ pub trait PosWrite<T: Copy> : Write<T> {
             }
         }
         Ok(())
+    }
+}
+
+impl<'a, T: Copy, R: ?Sized + DerefMut> Read<T> for R where R::Target: Read<T> {
+    type Err = <R::Target as Read<T>>::Err;
+
+    #[inline]
+    fn read(&mut self, buf: &mut [T]) -> Result<usize, Self::Err> {
+        R::Target::read(self.deref_mut(), buf)
+    }
+
+    #[inline]
+    fn readv(&mut self, buf: &mut [&mut [T]]) -> Result<usize, Self::Err> {
+        R::Target::readv(self.deref_mut(), buf)
+    }
+}
+
+impl<'a, T: Copy, W: ?Sized + DerefMut> Write<T> for W where W::Target: Write<T> {
+    type Err = <W::Target as Write<T>>::Err;
+
+    #[inline]
+    fn write(&mut self, buf: &[T]) -> Result<usize, Self::Err> {
+        W::Target::write(self.deref_mut(), buf)
+    }
+
+    #[inline]
+    fn writev(&mut self, buf: &[&[T]]) -> Result<usize, Self::Err> {
+        W::Target::writev(self.deref_mut(), buf)
+    }
+
+    #[inline]
+    fn flush(&mut self) -> Result<(), Self::Err> {
+        W::Target::flush(self.deref_mut())
     }
 }
 
