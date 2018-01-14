@@ -6,6 +6,7 @@
 #![cfg_attr(test, plugin(quickcheck_macros))]
 
 extern crate containers;
+extern crate loca;
 extern crate void;
 
 #[cfg(test)] extern crate quickcheck;
@@ -17,6 +18,7 @@ use core::convert::From;
 use core::marker::PhantomData;
 use core::mem;
 use core::ops::*;
+use loca::Alloc;
 use void::Void;
 
 mod pos;
@@ -88,11 +90,11 @@ pub trait Read<T: Copy> {
     /// Pull data from this source into the spare storage of `xs`, and modify its length to include the data read.
     /// If this fails, `xs` is unmodified.
     #[inline]
-    fn read_onto_vec(&mut self, xs: &mut Vec<T>) -> Result<(), Self::Err> {
+    fn read_onto_vec<A: Alloc>(&mut self, xs: &mut Vec<T, A>) -> Result<usize, Self::Err> {
         let l = xs.len();
         let m = try!(self.read(unsafe { &mut xs.storage_mut()[l..] }));
         unsafe { xs.set_length(l+m) };
-        Ok(())
+        Ok(m)
     }
 
     #[inline]
@@ -201,7 +203,7 @@ impl<R: Read<T>, T: Copy, P: FnMut(T) -> bool, E: From<R::Err> + From<NoMemory>>
                     self.buf = Some(buf);
                     return Some(Err(E::from(e)));
                 },
-                Ok(()) => if buf.len() == l { return Some(Ok(buf)) },
+                Ok(_) => if buf.len() == l { return Some(Ok(buf)) },
             }
         }
     }
