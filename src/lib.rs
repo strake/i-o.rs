@@ -152,6 +152,17 @@ impl<R: Read<T>, T: Copy> Iterator for Data<R, T> {
     }
 }
 
+impl<R: Read<T>, T: Copy> Deref for Data<R, T> {
+    type Target = R;
+    #[inline]
+    fn deref(&self) -> &R { &self.1 }
+}
+
+impl<R: Read<T>, T: Copy> DerefMut for Data<R, T> {
+    #[inline]
+    fn deref_mut(&mut self) -> &mut R { &mut self.1 }
+}
+
 pub struct Split<R: Read<T>, T: Copy, P: FnMut(T) -> bool, E: From<R::Err> + From<NoMemory>> {
     φ: PhantomData<E>,
     pub r: R,
