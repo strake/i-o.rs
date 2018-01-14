@@ -77,6 +77,11 @@ pub trait Read<T: Copy> {
         Ok(())
     }
 
+    /// Return bounds on number of data ready to read.
+    ///
+    /// The default returns `(0 None)` which is never wrong.
+    #[inline] fn size_hint(&self) -> (usize, Option<usize>) { (0, None) }
+
     /// Make an `Iterator` over the data of this reader.
     #[inline] fn data(self) -> Data<Self, T> where Self: Sized { Data(PhantomData, self) }
 
