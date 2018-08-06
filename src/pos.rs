@@ -45,6 +45,7 @@ impl<S: Copy, T: DerefMut<Target = [S]>> Write<S> for Pos<T> {
 impl<T: DerefMut<Target = [u8]>> fmt::Write for Pos<T> {
     #[inline]
     fn write_str(&mut self, s: &str) -> fmt::Result { match self.write(s.as_bytes()) {
+        Ok(0) if s.len() > 0 => Err(fmt::Error),
         Ok(_) => Ok(()),
         Err(v) => match v {},
     } }

@@ -152,6 +152,8 @@ impl<R: Read<T>, T: Copy> Iterator for Data<R, T> {
             Ok(_) => Some(Ok(buf[0])),
         }
     }
+
+    #[inline] fn size_hint(&self) -> (usize, Option<usize>) { self.1.size_hint() }
 }
 
 impl<R: Read<T>, T: Copy> Deref for Data<R, T> {
