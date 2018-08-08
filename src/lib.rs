@@ -71,8 +71,8 @@ pub trait Read<T: Copy> {
     #[inline]
     fn try_read_full(&mut self, buf: &mut [T]) -> Result<usize, (Self::Err, usize)> {
         let mut n = 0;
-        while n < buf.len() {
-            match self.read(&mut buf[n..]) {
+        while let Some(buf) = buf.get_mut(n..) {
+            match self.read(buf) {
                 Err(e) => return Err((e, n)),
                 Ok(0) => break,
                 Ok(m) => n += m,
@@ -136,8 +136,8 @@ pub trait PosRead<T: Copy>: Read<T> {
     #[inline]
     fn pread_full<E: From<Self::Err> + From<EndOfFile>>(&mut self, buf: &mut [T], mut pos: usize) -> Result<(), (E, usize)> {
         let mut n = 0;
-        while n < buf.len() {
-            match self.pread(&mut buf[n..], pos) {
+        while let Some(buf) = buf.get_mut(n..) {
+            match self.pread(buf, pos) {
                 Err(e) => return Err((E::from(e), n)),
                 Ok(0) => return Err((E::from(EndOfFile), n)),
                 Ok(m) => {
@@ -264,8 +264,8 @@ pub trait Write<T: Copy> {
     #[inline]
     fn write_all(&mut self, buf: &[T]) -> Result<(), (Self::Err, usize)> where Self::Err: From<EndOfFile> {
         let mut n = 0;
-        while n < buf.len() {
-            match self.write(&buf[n..]) {
+        while let Some(buf) = buf.get(n..) {
+            match self.write(buf) {
                 Err(e) => return Err((e, n)),
                 Ok(0) => return Err((Self::Err::from(EndOfFile), n)),
                 Ok(m) => n += m,
@@ -294,8 +294,8 @@ pub trait PosWrite<T: Copy> : Write<T> {
     /// Push `buf.len()` data to this sink at given position from given buffer; return `()` if so many data were actually written, or a failure and how many data were written before the failure.
     #[inline] fn pwrite_all(&mut self, buf: &[T], mut pos: usize) -> Result<(), (Self::Err, usize)> where Self::Err: From<EndOfFile> {
         let mut n = 0;
-        while n < buf.len() {
-            match self.pwrite(&buf[n..], pos) {
+        while let Some(buf) = buf.get(n..) {
+            match self.pwrite(buf, pos) {
                 Err(e) => return Err((e, n)),
                 Ok(0) => return Err((Self::Err::from(EndOfFile), n)),
                 Ok(m) => {
