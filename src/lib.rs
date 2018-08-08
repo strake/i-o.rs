@@ -65,18 +65,29 @@ pub trait Read<T: Copy> {
         Ok(0)
     }
 
-    /// Pull `buf.len()` data from this source into given buffer; return `()` if so many data were actually read, or a failure and how many data were read before the failure.
+    /// Pull `buf.len()` data from this source into given buffer; return how many data were
+    /// actually read (which may be less than `buf.len()` if we reached end-of-file), or a
+    /// failure and how many data were read before the failure.
     #[inline]
-    fn read_full<E: From<Self::Err> + From<EndOfFile>>(&mut self, buf: &mut [T]) -> Result<(), (E, usize)> {
+    fn try_read_full(&mut self, buf: &mut [T]) -> Result<usize, (Self::Err, usize)> {
         let mut n = 0;
         while n < buf.len() {
             match self.read(&mut buf[n..]) {
-                Err(e) => return Err((E::from(e), n)),
-                Ok(0) => return Err((E::from(EndOfFile), n)),
+                Err(e) => return Err((e, n)),
+                Ok(0) => break,
                 Ok(m) => n += m,
             }
         }
-        Ok(())
+        Ok(n)
+    }
+
+    /// Pull `buf.len()` data from this source into given buffer; return `()` if so many data were actually read, or a failure and how many data were read before the failure.
+    #[inline]
+    fn read_full<E: From<Self::Err> + From<EndOfFile>>(&mut self, buf: &mut [T]) -> Result<(), (E, usize)> {
+        match self.try_read_full(buf) {
+            Err((e, n)) => Err((E::from(e), n)),
+            Ok(n) => if n < buf.len() { Err((E::from(EndOfFile), n)) } else { Ok(()) },
+        }
     }
 
     /// Return bounds on number of data ready to read.
