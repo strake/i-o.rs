@@ -5,6 +5,8 @@
 #![cfg_attr(test, feature(plugin))]
 #![cfg_attr(test, plugin(quickcheck_macros))]
 
+#![deny(missing_debug_implementations)]
+
 extern crate containers;
 extern crate loca;
 extern crate void;
@@ -150,6 +152,7 @@ pub trait PosRead<T: Copy>: Read<T> {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct Data<R: Read<T>, T: Copy>(PhantomData<T>, R);
 
 impl<R: Read<T>, T: Copy> Iterator for Data<R, T> {
@@ -178,6 +181,7 @@ impl<R: Read<T>, T: Copy> DerefMut for Data<R, T> {
     fn deref_mut(&mut self) -> &mut R { &mut self.1 }
 }
 
+#[derive(Debug)]
 pub struct Split<R: Read<T>, T: Copy, P: FnMut(T) -> bool, E: From<R::Err> + From<NoMemory>> {
     φ: PhantomData<E>,
     pub r: R,

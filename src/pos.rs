@@ -5,6 +5,7 @@ use void::Void;
 
 use super::*;
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Pos<T> {
     buf: T,
     pub pos: usize,
