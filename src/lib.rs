@@ -112,7 +112,7 @@ pub trait Read<T: Copy> {
 
     #[inline]
     fn split<P: FnMut(T) -> bool, E: From<Self::Err> + From<NoMemory>>(self, p: P, keep_delim: bool) -> Split<Self, T, P, E> where Self: Sized {
-        Split{ φ: PhantomData, r: self, p: p, buf: Some(Vec::new()), keep_delim: keep_delim }
+        Split{ φ: PhantomData, r: self, p, buf: Some(Vec::new()), keep_delim }
     }
 }
 
