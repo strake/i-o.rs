@@ -14,5 +14,6 @@ loca = ">=0.6, <0.8"
 void = { version = "1", default-features = false }
 
 [dev-dependencies]
-quickcheck = "0.6"
-quickcheck_macros = "0.6"
+quickcheck = "0.7"
+quickcheck_macros = "0.7"
+rand = "0.6"

@@ -12,6 +12,7 @@ extern crate loca;
 extern crate void;
 
 #[cfg(test)] extern crate quickcheck;
+#[cfg(test)] extern crate rand;
 #[cfg(test)] extern crate std;
 
 use containers::collections::Vec;
@@ -269,6 +270,7 @@ pub trait Write<T: Copy> {
     fn write_all(&mut self, buf: &[T]) -> Result<(), (Self::Err, usize)> where Self::Err: From<EndOfFile> {
         let mut n = 0;
         while let Some(buf) = buf.get(n..) {
+            if 0 == buf.len() { break }
             match self.write(buf) {
                 Err(e) => return Err((e, n)),
                 Ok(0) => return Err((Self::Err::from(EndOfFile), n)),
