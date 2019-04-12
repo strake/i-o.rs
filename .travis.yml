@@ -1,8 +1,8 @@
 language: rust
 
 rust:
+- stable
 - beta
-- nightly-2017-10-14
 
 env:
 - RUSTC_BOOTSTRAP=1
