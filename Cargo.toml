@@ -10,6 +10,7 @@ name = "io"
 
 [dependencies]
 containers = { version = ">=0.8, <0.10", default-features = false, features = ["default_allocator"] }
+either = { version = "1", default-features = false }
 loca = ">=0.6, <0.8"
 void = { version = "1", default-features = false }
 
