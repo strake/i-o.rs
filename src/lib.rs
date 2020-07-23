@@ -19,7 +19,7 @@ use containers::collections::Vec;
 use core::cmp::max;
 use core::convert::From;
 use core::marker::PhantomData;
-use core::mem;
+use core::mem::MaybeUninit as MU;
 use core::ops::*;
 use loca::Alloc;
 use void::Void;
@@ -159,14 +159,14 @@ pub struct Data<R: Read<T>, T: Copy>(PhantomData<T>, R);
 impl<R: Read<T>, T: Copy> Iterator for Data<R, T> {
     type Item = Result<T, R::Err>;
 
-    #[inline] fn next(&mut self) -> Option<Self::Item> {
-        let mut buf: [T; 1] = unsafe { mem::uninitialized() };
-        match self.1.read(&mut buf) {
+    #[inline] fn next(&mut self) -> Option<Self::Item> { unsafe {
+        let mut buf: MU<[T; 1]> = MU::uninit();
+        match self.1.read(&mut *buf.as_mut_ptr()) {
             Err(e) => Some(Err(e)),
             Ok(0) => None,
-            Ok(_) => Some(Ok(buf[0])),
+            Ok(_) => Some(Ok(buf.assume_init()[0])),
         }
-    }
+    } }
 
     #[inline] fn size_hint(&self) -> (usize, Option<usize>) { self.1.size_hint() }
 }
