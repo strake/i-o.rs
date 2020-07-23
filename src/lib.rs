@@ -11,6 +11,7 @@
 #![deny(missing_debug_implementations)]
 
 extern crate containers;
+extern crate either;
 extern crate loca;
 extern crate void;
 
@@ -24,6 +25,7 @@ use core::convert::From;
 use core::marker::PhantomData;
 use core::mem::MaybeUninit as MU;
 use core::ops::*;
+use either::Either::{self, *};
 use loca::Alloc;
 use void::Void;
 
@@ -270,13 +272,19 @@ pub trait Write<T: Copy> {
 
     /// Push `buf.len()` data to this sink from given buffer; return `()` if so many data were actually written, or a failure and how many data were written before the failure.
     #[inline]
-    fn write_all(&mut self, buf: &[T]) -> Result<(), (Self::Err, usize)> where Self::Err: From<EndOfFile> {
+    fn write_all<E>(&mut self, buf: &[T]) -> Result<(), (Self::Err, usize)> where Self::Err: From<EndOfFile> {
+        self.write_all_e(buf).map_err(|(x, y)| (match x { Left(a) => a.into(), Right(b) => b }, y))
+    }
+
+    /// Push `buf.len()` data to this sink from given buffer; return `()` if so many data were actually written, or a failure and how many data were written before the failure.
+    #[inline]
+    fn write_all_e(&mut self, buf: &[T]) -> Result<(), (Either<EndOfFile, Self::Err>, usize)> {
         let mut n = 0;
         while let Some(buf) = buf.get(n..) {
             if 0 == buf.len() { break }
             match self.write(buf) {
-                Err(e) => return Err((e, n)),
-                Ok(0) => return Err((Self::Err::from(EndOfFile), n)),
+                Err(e) => return Err((Right(e), n)),
+                Ok(0) => return Err((Left(EndOfFile), n)),
                 Ok(m) => n += m,
             }
         }
