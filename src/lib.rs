@@ -106,7 +106,7 @@ pub trait Read<T: Copy> {
     #[inline]
     fn read_onto_vec<A: Alloc>(&mut self, xs: &mut Vec<T, A>) -> Result<usize, Self::Err> {
         let l = xs.len();
-        let m = try!(self.read(unsafe { &mut xs.storage_mut()[l..] }));
+        let m = self.read(unsafe { &mut xs.storage_mut()[l..] })?;
         unsafe { xs.set_length(l+m) };
         Ok(m)
     }
