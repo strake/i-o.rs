@@ -322,6 +322,19 @@ pub trait PosWrite<T: Copy> : Write<T> {
     }
 }
 
+pub trait Seek {
+    type Err;
+
+    fn seek(&mut self, _: SeekFrom) -> Result<u64, Self::Err>;
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+pub enum SeekFrom {
+    Start(u64),
+    End(i64),
+    Here(i64),
+}
+
 impl<'a, T: Copy, R: ?Sized + DerefMut> Read<T> for R where R::Target: Read<T> {
     type Err = <R::Target as Read<T>>::Err;
 
@@ -352,6 +365,15 @@ impl<'a, T: Copy, W: ?Sized + DerefMut> Write<T> for W where W::Target: Write<T>
     #[inline]
     fn flush(&mut self) -> Result<(), Self::Err> {
         W::Target::flush(self.deref_mut())
+    }
+}
+
+impl<'a, S: ?Sized + DerefMut> Seek for S where S::Target: Seek {
+    type Err = <S::Target as Seek>::Err;
+
+    #[inline]
+    fn seek(&mut self, pos: SeekFrom) -> Result<u64, Self::Err> {
+        S::Target::seek(self.deref_mut(), pos)
     }
 }
 
